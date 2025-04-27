@@ -6,24 +6,28 @@ import { Link, useNavigate } from "react-router-dom";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");  
   const navigate = useNavigate();
 
-  
   const handleSubmit = (e) => {
     e.preventDefault();  
 
     axios.post("http://localhost:3001/login", { email, password })
-      .then((result) => {
-        console.log(result);
-        if (result.data.message === "Success") {
-          navigate("/home"); 
-        } else {
-          alert(result.data.message); 
-        }
-      })
-      .catch((error) => {
-        console.error("Login failed:", error);  
-      });
+  .then((result) => {
+    console.log("Response:", result);  
+    if (result.data.message === "Login successful") {  
+      navigate("/home");  
+      setPassword("");  
+      setErrorMessage("");  
+    } else {
+      setErrorMessage(result.data.message);  
+    }
+  })
+  .catch((error) => {
+    console.error("Login failed:", error);  
+    setErrorMessage("Something went wrong, please try again.");
+  });
+
   };
 
   return (
@@ -63,6 +67,13 @@ const Login = () => {
               required
             />
           </div>
+
+          {/* Display error message */}
+          {errorMessage && (
+            <div className="text-red-600 text-center mb-4">
+              <p>{errorMessage}</p>
+            </div>
+          )}
 
           <button
             type="submit"
